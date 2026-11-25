@@ -168,3 +168,10 @@ async function main(): Promise<void> {
     rl.close();
   }
 }
+
+// jalankan program utama
+main().catch((error: unknown) => {
+  const pesan: string = error instanceof Error ? error.message : String(error);
+  console.log("Terjadi kesalahan: " + pesan);
+  process.exit(1);
+});
