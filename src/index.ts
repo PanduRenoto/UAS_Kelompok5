@@ -50,6 +50,53 @@ interface Booking {
   statusPesanan: string;       // status pesanan
 }
 
+// blok 5: fitur create
+
+// tambah booking baru
+async function tambahBooking(_rl: readline.Interface): Promise<void> {
+  tampilkanFiturBelumTersedia("Tambah Booking", 3);
+}
+
+// blok 6: fitur read
+
+// tampilkan semua booking
+function tampilSemuaBooking(): void {
+  tampilkanFiturBelumTersedia("Lihat Semua Booking", 4);
+}
+
+// tampilkan detail booking berdasarkan id
+async function tampilDetailBooking(_rl: readline.Interface): Promise<void> {
+  tampilkanFiturBelumTersedia("Lihat Detail Booking", 4);
+}
+
+// blok 7: fitur update
+
+// ubah data booking
+async function ubahBooking(_rl: readline.Interface): Promise<void> {
+  tampilkanFiturBelumTersedia("Ubah Booking", 5);
+}
+
+// blok 8: fitur delete
+
+// hapus data booking
+async function hapusBooking(_rl: readline.Interface): Promise<void> {
+  tampilkanFiturBelumTersedia("Hapus Booking", 5);
+}
+
+// blok 9: fitur search
+
+// cari data booking
+async function cariBooking(_rl: readline.Interface): Promise<void> {
+  tampilkanFiturBelumTersedia("Cari Booking", 6);
+}
+
+// blok 10: menu utama
+
+// pesan penanda fitur belum tersedia
+function tampilkanFiturBelumTersedia(namaFitur: string, progress: number): void {
+  console.log(`\nFitur ${namaFitur} akan tersedia pada Progress ${progress}.\n`);
+}
+
 // tampilan menu utama
 function tampilkanMenu(): void {
   const totalBooking: number = daftarBooking.length;
