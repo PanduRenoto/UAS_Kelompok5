@@ -50,6 +50,58 @@ interface Booking {
   statusPesanan: string;       // status pesanan
 }
 
+// blok 2: konstanta dan data awal
+
+// batas maksimal sesi
+const maxSesi: number = 3;
+// batas pilihan hari ke depan
+const jumlahHariBooking: number = 7;
+// syarat minimal sesi untuk diskon durasi
+const minSesiDiskonDurasi: number = 2;
+
+// diskon durasi
+const diskonDurasi2Jam: number = 0.05;
+const diskonDurasi3Jam: number = 0.1;
+
+// diskon jumlah sesi
+const diskonSesi2: number = 0.05;
+const diskonSesi3: number = 0.1;
+
+// daftar lapangan
+const daftarLapangan: Lapangan[] = [
+    { id: "1", nama: "Lapangan A - Vinyl", jamOperasional: "08:00-23:00", jamBukaMenit: 480, jamTutupMenit: 1380, hargaPerJam: 80000 },
+    { id: "2", nama: "Lapangan B - Rumput Sintetis", jamOperasional: "08:00-23:00", jamBukaMenit: 480, jamTutupMenit: 1380, hargaPerJam: 100000 },
+    { id: "3", nama: "Lapangan C - Premium", jamOperasional: "08:00-23:00", jamBukaMenit: 480, jamTutupMenit: 1380, hargaPerJam: 125000 },
+    { id: "4", nama: "Lapangan D - Indoor", jamOperasional: "08:00-23:00", jamBukaMenit: 480, jamTutupMenit: 1380, hargaPerJam: 150000 },
+    { id: "5", nama: "Lapangan E - Rumput Sintetis Premium", jamOperasional: "08:00-23:00", jamBukaMenit: 480, jamTutupMenit: 1380, hargaPerJam: 175000 }
+];
+
+// opsi durasi dan metode pembayaran
+const daftarDurasiPilihan: number[] = [1, 2, 3];
+const daftarMetodePembayaran: string[] = ["Kartu Kredit", "QRIS", "Transfer Bank"];
+
+// data awal booking
+function buatDataAwal(): Booking[] {
+    return [];
+}
+
+// array penyimpan data booking
+const daftarBooking: Booking[] = buatDataAwal();
+
+// blok 3: fungsi utilitas
+
+// format angka ke rupiah
+function formatRupiah(angka: number): string {
+    return "Rp" + angka;
+}
+
+// hitung total pendapatan dari booking yang lunas
+function hitungTotalPendapatan(_data: Booking[]): number {
+    return 0;
+}
+
+// blok 4: perhitungan dan validasi jadwal
+
 // blok 5: fitur create
 
 // tambah booking baru
