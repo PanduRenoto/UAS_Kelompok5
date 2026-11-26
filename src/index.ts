@@ -229,6 +229,64 @@ function hitungPersenDiskon(durasiJam: number, jumlahSesi: number): number {
     return Math.round(totalPersen * 100);
 }
 
+// Membuat satu objek Booking lengkap dengan semua perhitungannya
+// Dipakai untuk seed data, Create, dan hitung ulang saat Update
+function buatBooking(
+    id: number,
+    namaPemesan: string,
+    lapangan: Lapangan,
+    tanggal: string,
+    durasiJam: number,
+    jamMulaiList: string[],
+    metodePembayaran: string,
+    lunas: boolean,
+    statusPesanan: string
+): Booking {
+    // Penampung sesi yang sudah lolos validasi
+    const sesiList: SesiBooking[] = [];
+
+    // Perulangan for...of: validasi tiap jam mulai, hentikan dengan error kalau ada yang salah
+    for (const jamMulai of jamMulaiList) {
+        const hasil: HasilValidasiSesi = validasiSesiBaru(jamMulai, durasiJam, lapangan, sesiList);
+        if (hasil.valid && hasil.sesi !== undefined) {
+            sesiList.push(hasil.sesi);
+        } else {
+            throw new Error(Sesi ${sesiList.length + 1} (${namaPemesan}): ${hasil.pesan});
+        }
+    }
+
+    // Seleksi if: jumlah sesi harus 1 sampai maxSesi
+    if (sesiList.length < 1 || sesiList.length > maxSesi) {
+        throw new Error(Jumlah sesi harus antara 1 dan ${maxSesi}.);
+    }
+
+    // Hitung subtotal, persen diskon, nilai diskon (dibulatkan ke rupiah), dan total bayar
+    const subtotal: number = hitungSubtotal(sesiList, lapangan.hargaPerJam);
+    const persenDiskon: number = hitungPersenDiskon(durasiJam, sesiList.length);
+    const diskon: number = Math.round(subtotal * persenDiskon / 100);
+    let totalBayar: number = subtotal;
+    totalBayar -= diskon;
+
+    // Mengembalikan objek Booking yang siap disimpan ke array
+    return {
+        id,
+        namaPemesan,
+        lapangan: lapangan.nama,
+        tanggal,
+        durasiJam,
+        jumlahSesi: sesiList.length,
+        sesi: sesiList,
+        hargaPerJam: lapangan.hargaPerJam,
+        subtotal,
+        persenDiskon,
+        diskon,
+        totalBayar,
+        metodePembayaran,
+        lunas,
+        statusPesanan
+    };
+}
+
 // blok 5: fitur create
 
 // tambah booking baru
