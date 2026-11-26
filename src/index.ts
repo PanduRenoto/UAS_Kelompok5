@@ -430,6 +430,28 @@ function idSudahAda(id: number): boolean {
   return daftarBooking.some((booking) => booking.id === id);
 }
 
+// membuat id baru: id terbesar + 1, lalu dipastikan tidak ada duplikasi
+function buatIdBaru(): number {
+  // penampung id terbesar yang sudah ada
+  let idTerbesar: number = 0;
+
+  // perulangan for...of: cari id terbesar
+  for (const booking of daftarBooking) {
+    if (booking.id > idTerbesar) {
+      idTerbesar = booking.id;
+    }
+  }
+
+  // id baru = id terbesar + 1
+  let idBaru: number = idTerbesar + 1;
+
+  // perulangan while: naikkan id selama masih dipakai (pencegahan duplikasi)
+  while (idSudahAda(idBaru)) {
+    idBaru++;
+  }
+  return idBaru;
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
