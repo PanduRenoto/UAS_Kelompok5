@@ -425,6 +425,11 @@ function periksaPilihanAngka(teks: string, min: number, maks: number): string {
   return "";
 }
 
+// mengecek apakah id sudah dipakai booking lain
+function idSudahAda(id: number): boolean {
+  return daftarBooking.some((booking) => booking.id === id);
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
