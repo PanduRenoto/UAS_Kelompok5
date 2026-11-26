@@ -157,8 +157,22 @@ function buatDaftarTanggal(acuan?: Date): string[] {
     return daftar;
 }
 // hitung total pendapatan dari booking yang lunas
-function hitungTotalPendapatan(_data: Booking[]): number {
-    return 0;
+function hitungTotalPendapatan(data: Booking[]): number {
+    // Penampung total pendapatan
+    let totalPendapatan: number = 0;
+
+    // Perulangan for...of: periksa setiap booking
+    for (const booking of data) {
+        // Penanda booking dibatalkan
+        const dibatalkan: boolean = booking.statusPesanan === "Booking dibatalkan";
+        // Seleksi if dengan dua kondisi: harus lunas (&&) dan tidak (!) dibatalkan
+        if (booking.lunas && !dibatalkan) {
+            totalPendapatan += booking.totalBayar;
+        }
+    }
+
+    // Mengembalikan total pendapatan
+    return totalPendapatan;
 }
 
 // blok 4: perhitungan dan validasi jadwal
