@@ -96,7 +96,7 @@ function formatRupiah(angka: number): string {
     return "Rp" + angka.toLocaleString("id-ID");
 }
 // Mengubah teks jam "HH:mm" menjadi total menit sejak 00:00, mengembalikan null kalau formatnya salah
-function ubahjamKemenit(teks: string): number | null {
+function ubahJamKeMenit(teks: string): number | null {
   //pola jam yang sah: jam 00-23, menit 00-59, dipisah titik dua
   const polajam: RegExp = /^([01]\d|2[0-3]):([0-5]\d)$/;
   // Mencocokan teks (spasi di awal dan akhir dibuang dulu) dengan pola 
@@ -109,6 +109,15 @@ function ubahjamKemenit(teks: string): number | null {
 
   // Total menit = jam x 60 + menit
   return Number(hasil[1]) * 60 + Number(hasil[2]);
+}
+
+// Mengubah total menit sejak 00:00 menjadi teks "HH:mm", contoh 540 menjadi "09.00"
+function formatMenit(totalMenit: number): string {
+  // Jam adalah hasil bagi bulat, menit adalah sisa bagi (modulo)
+  const jam: number = Math.floor(totalMenit / 60);
+  const menit: number = totalMenit % 60) ;
+  // padStart menambah angka 0 di depan supaya selalu 2 digit
+  return String (jam).padStart(2, "0") + ":" + String(menit).padStart(2, "0");
 }
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(_data: Booking[]): number {
