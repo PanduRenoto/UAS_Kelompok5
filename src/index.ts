@@ -119,6 +119,12 @@ function formatMenit(totalMenit: number): string {
   // padStart menambah angka 0 di depan supaya selalu 2 digit
   return String (jam).padStart(2, "0") + ":" + String(menit).padStart(2, "0");
 }
+
+//Mengecek dua sesi bertumpuk, sesi yang bersebelahan (selesai A = mulai B) tidak dihitung mulai 
+function sesiBertumpuk(mulaiA: number, selesaiA: number, mulaiB: number, selesaiB: number): boolean {
+  //Bertumpuk kalau A mulai sebelum B selesai DAN A selesai setelah B mulai
+  return mulaiA < selesaiB && selesaiA > mulaiB;
+}
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(_data: Booking[]): number {
     return 0;
