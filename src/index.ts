@@ -379,6 +379,33 @@ function periksaNama(nama: string): string {
   return "";
 }
 
+// memeriksa pilihan angka (kosong, bukan angka/NaN, negatif, desimal, di luar batas)
+function periksaPilihanAngka(teks: string, min: number, maks: number): string {
+  // seleksi if: input tidak boleh kosong
+  if (teks.trim() === "") {
+    return "Input tidak boleh kosong.";
+  }
+
+  // ubah teks menjadi angka
+  const angka: number = Number(teks);
+
+  // seleksi if: hasil ubah harus berupa angka
+  if (Number.isNaN(angka)) {
+    return "Input harus berupa angka.";
+  }
+  // seleksi if: angka tidak boleh negatif
+  if (angka < 0) {
+    return "Angka tidak boleh negatif.";
+  }
+  // seleksi if dengan dua kondisi: harus bulat dan berada dalam rentang min sampai maks
+  if (!Number.isInteger(angka) || angka < min || angka > maks) {
+    return `Masukkan angka bulat ${min} sampai ${maks}.`;
+  }
+
+  // angka lolos pemeriksaan
+  return "";
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
