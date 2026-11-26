@@ -115,7 +115,7 @@ function ubahJamKeMenit(teks: string): number | null {
 function formatMenit(totalMenit: number): string {
   // Jam adalah hasil bagi bulat, menit adalah sisa bagi (modulo)
   const jam: number = Math.floor(totalMenit / 60);
-  const menit: number = totalMenit % 60) ;
+  const menit: number = totalMenit % 60;
   // padStart menambah angka 0 di depan supaya selalu 2 digit
   return String (jam).padStart(2, "0") + ":" + String(menit).padStart(2, "0");
 }
