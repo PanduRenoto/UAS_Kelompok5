@@ -55,6 +55,10 @@ interface HasilValidasi {
     pesan: string;  // alasan penolakan kalau tidak valid
 }
 
+// batas durasi sewa per booking (jam)
+const MIN_DURASI: number = 1;
+const MAKS_DURASI: number = 3;
+
 // batas panjang nama pemesan
 const MAKS_NAMA: number = 30;
 
@@ -174,6 +178,24 @@ function validasiTanggal(teks: string): HasilValidasi {
         return { valid: false, pesan: "Tanggal tidak boleh yang sudah lewat." };
     }
 
+    return { valid: true, pesan: "" };
+}
+
+// validasi durasi: harus angka, bukan NaN, tidak negatif, bulat, dan dalam batas
+function validasiDurasi(teks: string): HasilValidasi {
+    if (teks.trim() === "") {
+        return { valid: false, pesan: "Durasi tidak boleh kosong." };
+    }
+    const angka = Number(teks);
+    if (Number.isNaN(angka)) {
+        return { valid: false, pesan: "Durasi harus berupa angka." };
+    }
+    if (angka < 0) {
+        return { valid: false, pesan: "Durasi tidak boleh negatif." };
+    }
+    if (!Number.isInteger(angka) || angka < MIN_DURASI || angka > MAKS_DURASI) {
+        return { valid: false, pesan: "Durasi harus bilangan bulat " + MIN_DURASI + " sampai " + MAKS_DURASI + " jam." };
+    }
     return { valid: true, pesan: "" };
 }
 
