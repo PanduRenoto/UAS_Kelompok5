@@ -149,6 +149,34 @@ function validasiNama(nama: string): HasilValidasi {
     return { valid: true, pesan: "" };
 }
 
+// validasi tanggal: format YYYY-MM-DD, tanggal nyata, dan tidak boleh sudah lewat
+function validasiTanggal(teks: string): HasilValidasi {
+    // cek pola format tanggal
+    const cocok = /^(\d{4})-(\d{2})-(\d{2})$/.exec(teks);
+    if (cocok === null) {
+        return { valid: false, pesan: "Format tanggal harus YYYY-MM-DD, contoh 2026-12-15." };
+    }
+
+    const tahun = Number(cocok[1]);
+    const bulan = Number(cocok[2]);
+    const hari = Number(cocok[3]);
+    const tanggal = new Date(tahun, bulan - 1, hari);
+
+    // Date menggeser tanggal yang tidak nyata (misal 31 Februari), jadi dibandingkan ulang
+    if (tanggal.getFullYear() !== tahun || tanggal.getMonth() !== bulan - 1 || tanggal.getDate() !== hari) {
+        return { valid: false, pesan: "Tanggal tersebut tidak ada di kalender." };
+    }
+
+    // tanggal tidak boleh sebelum hari ini
+    const hariIni = new Date();
+    hariIni.setHours(0, 0, 0, 0);
+    if (tanggal < hariIni) {
+        return { valid: false, pesan: "Tanggal tidak boleh yang sudah lewat." };
+    }
+
+    return { valid: true, pesan: "" };
+}
+
 // Mengubah total menit sejak 00:00 menjadi teks "HH:mm", contoh 540 menjadi "09.00"
 function formatMenit(totalMenit: number): string {
   // Jam adalah hasil bagi bulat, menit adalah sisa bagi (modulo)
