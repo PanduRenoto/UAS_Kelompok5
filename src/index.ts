@@ -171,6 +171,24 @@ function validasiSesiBaru(
     };
 }
 
+// Menghitung subtotal: jumlah (lama sesi dalam jam x harga per jam) dari semua sesi
+function hitungSubtotal(daftarSesi: SesiBooking[], hargaPerJam: number): number {
+    // Penampung total biaya
+    let subtotal: number = 0;
+
+    // Perulangan for...of: proses setiap sesi
+    for (const sesi of daftarSesi) {
+        // Lama sesi dalam menit, lalu diubah ke jam dengan compound /=
+        let lamaJam: number = sesi.selesaiMenit - sesi.mulaiMenit;
+        lamaJam /= 60;
+        // Tambahkan biaya sesi ini ke subtotal dengan compound +=
+        subtotal += lamaJam * hargaPerJam;
+    }
+
+    // Mengembalikan subtotal seluruh sesi
+    return subtotal;
+}
+
 // blok 5: fitur create
 
 // tambah booking baru
