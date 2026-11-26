@@ -50,6 +50,14 @@ interface Booking {
   statusPesanan: string;       // status pesanan
 }
 
+interface HasilValidasi {
+    valid: boolean; // true kalau input boleh dipakai
+    pesan: string;  // alasan penolakan kalau tidak valid
+}
+
+// batas panjang nama pemesan
+const MAKS_NAMA: number = 30;
+
 // blok 2: konstanta dan data awal
 
 // batas maksimal sesi
@@ -128,6 +136,17 @@ function ubahJamKeMenit(teks: string): number | null {
 
   // Total menit = jam x 60 + menit
   return Number(hasil[1]) * 60 + Number(hasil[2]);
+}
+
+// validasi nama: tidak boleh kosong dan tidak terlalu panjang
+function validasiNama(nama: string): HasilValidasi {
+    if (nama.trim() === "") {
+        return { valid: false, pesan: "Nama tidak boleh kosong." };
+    }
+    if (nama.trim().length > MAKS_NAMA) {
+        return { valid: false, pesan: "Nama maksimal " + MAKS_NAMA + " karakter." };
+    }
+    return { valid: true, pesan: "" };
 }
 
 // Mengubah total menit sejak 00:00 menjadi teks "HH:mm", contoh 540 menjadi "09.00"
