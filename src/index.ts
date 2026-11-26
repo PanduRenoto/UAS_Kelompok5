@@ -452,6 +452,20 @@ function buatIdBaru(): number {
   return idBaru;
 }
 
+// menanyakan nama sampai valid
+async function tanyaNama(rl: readline.Interface): Promise<string> {
+  let nama: string = (await rl.question("Nama pemesan: ")).trim();
+  let pesan: string = periksaNama(nama);
+
+  // perulangan while: ulangi selama nama belum valid
+  while (pesan !== "") {
+    console.log("  [!] " + pesan);
+    nama = (await rl.question("Nama pemesan: ")).trim();
+    pesan = periksaNama(nama);
+  }
+  return nama;
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
