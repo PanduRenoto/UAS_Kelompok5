@@ -82,7 +82,26 @@ const daftarMetodePembayaran: string[] = ["Kartu Kredit", "QRIS", "Transfer Bank
 
 // data awal booking
 function buatDataAwal(): Booking[] {
-    return [];
+    // Array penampung data awal
+    const data: Booking[] = [];
+
+    // Data 1: Budi, Lapangan A, 1 sesi x 1 jam, QRIS, lunas
+    data.push(buatBooking(1, "Budi Santoso", daftarLapangan[0], "Senin, 14 Desember 2026", 1, ["09:00"], "QRIS", true, "Booking dikonfirmasi"));
+
+    // Data 2: Siti, Lapangan B, 2 sesi x 2 jam, Transfer Bank, lunas
+    data.push(buatBooking(2, "Siti Aminah", daftarLapangan[1], "Selasa, 15 Desember 2026", 2, ["10:00", "14:00"], "Transfer Bank", true, "Booking dikonfirmasi"));
+
+    // Data 3: Rizky, Lapangan C, 1 sesi x 3 jam, Kartu Kredit, lunas
+    data.push(buatBooking(3, "Rizky Pratama", daftarLapangan[2], "Rabu, 16 Desember 2026", 3, ["19:00"], "Kartu Kredit", true, "Booking dikonfirmasi"));
+
+    // Data 4: Dewi, Lapangan D, 3 sesi x 1 jam, QRIS, belum lunas
+    data.push(buatBooking(4, "Dewi Lestari", daftarLapangan[3], "Kamis, 17 Desember 2026", 1, ["08:00", "10:00", "16:00"], "QRIS", false, "Menunggu pembayaran"));
+
+    // Data 5: Andi, Lapangan E, 1 sesi x 2 jam, Transfer Bank, lunas
+    data.push(buatBooking(5, "Andi Wijaya", daftarLapangan[4], "Jumat, 18 Desember 2026", 2, ["20:00"], "Transfer Bank", true, "Booking dikonfirmasi"));
+
+    // Mengembalikan seluruh data awal
+    return data;
 }
 
 // array penyimpan data booking
