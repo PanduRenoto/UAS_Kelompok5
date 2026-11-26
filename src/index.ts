@@ -109,14 +109,89 @@ const daftarBooking: Booking[] = buatDataAwal();
 
 // blok 3: fungsi utilitas
 
+
 // format angka ke rupiah
 function formatRupiah(angka: number): string {
-    return "Rp" + angka;
+    return "Rp" + angka.toLocaleString("id-ID");
+}
+// Mengubah teks jam "HH:mm" menjadi total menit sejak 00:00, mengembalikan null kalau formatnya salah
+function ubahJamKeMenit(teks: string): number | null {
+  //pola jam yang sah: jam 00-23, menit 00-59, dipisah titik dua
+  const polajam: RegExp = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  // Mencocokan teks (spasi di awal dan akhir dibuang dulu) dengan pola 
+  const hasil = polajam.exec(teks.trim());
+
+  // seleksi if: teks tidak cocok dengan pola berarti format salah 
+  if (hasil === null) {
+    return null;
+  }
+
+  // Total menit = jam x 60 + menit
+  return Number(hasil[1]) * 60 + Number(hasil[2]);
 }
 
+// Mengubah total menit sejak 00:00 menjadi teks "HH:mm", contoh 540 menjadi "09.00"
+function formatMenit(totalMenit: number): string {
+  // Jam adalah hasil bagi bulat, menit adalah sisa bagi (modulo)
+  const jam: number = Math.floor(totalMenit / 60);
+  const menit: number = totalMenit % 60;
+  // padStart menambah angka 0 di depan supaya selalu 2 digit
+  return String (jam).padStart(2, "0") + ":" + String(menit).padStart(2, "0");
+}
+
+//Mengecek dua sesi bertumpuk, sesi yang bersebelahan (selesai A = mulai B) tidak dihitung mulai 
+function sesiBertumpuk(mulaiA: number, selesaiA: number, mulaiB: number, selesaiB: number): boolean {
+  //Bertumpuk kalau A mulai sebelum B selesai DAN A selesai setelah B mulai
+  return mulaiA < selesaiB && selesaiA > mulaiB;
+}
+// Membuat label 7 hari ke depan mulai besok, contoh "Selasa, 1 Desember 2026"
+function buatDaftarTanggal(acuan?: Date): string[] {
+    // Nama hari sesuai urutan getDay (0 = Minggu)
+    const daftarNamaHari: string[] = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    // Nama bulan sesuai urutan getMonth (0 = Januari)
+    const daftarNamaBulan: string[] = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // Tanggal acuan: hari ini, kecuali diberikan tanggal lain
+    const tanggalAcuan: Date = acuan ?? new Date();
+    // Penampung label tanggal
+    const daftar: string[] = [];
+
+    // Perulangan for: urutan 1 = besok sampai urutan 7 = tujuh hari ke depan
+    for (let urutan = 1; urutan <= jumlahHariBooking; urutan++) {
+        // Date otomatis menyesuaikan pergantian bulan dan tahun
+        const tanggal: Date = new Date(
+            tanggalAcuan.getFullYear(),
+            tanggalAcuan.getMonth(),
+            tanggalAcuan.getDate() + urutan
+        );
+        // Menyusun label: nama hari, tanggal, nama bulan, tahun
+        const label: string = `${daftarNamaHari[tanggal.getDay()]}, ${tanggal.getDate()} ${daftarNamaBulan[tanggal.getMonth()]} ${tanggal.getFullYear()}`;
+        daftar.push(label);
+    }
+
+    // Mengembalikan 7 label tanggal
+    return daftar;
+}
 // hitung total pendapatan dari booking yang lunas
-function hitungTotalPendapatan(_data: Booking[]): number {
-    return 0;
+function hitungTotalPendapatan(data: Booking[]): number {
+    // Penampung total pendapatan
+    let totalPendapatan: number = 0;
+
+    // Perulangan for...of: periksa setiap booking
+    for (const booking of data) {
+        // Penanda booking dibatalkan
+        const dibatalkan: boolean = booking.statusPesanan === "Booking dibatalkan";
+        // Seleksi if dengan dua kondisi: harus lunas (&&) dan tidak (!) dibatalkan
+        if (booking.lunas && !dibatalkan) {
+            totalPendapatan += booking.totalBayar;
+        }
+    }
+
+    // Mengembalikan total pendapatan
+    return totalPendapatan;
 }
 
 // blok 4: perhitungan dan validasi jadwal
