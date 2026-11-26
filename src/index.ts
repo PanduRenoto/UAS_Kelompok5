@@ -466,6 +466,20 @@ async function tanyaNama(rl: readline.Interface): Promise<string> {
   return nama;
 }
 
+// menanyakan pilihan angka sampai valid, program tidak berhenti saat input salah
+async function tanyaPilihanAngka(rl: readline.Interface, pertanyaan: string, min: number, maks: number): Promise<number> {
+  let jawaban: string = (await rl.question(pertanyaan)).trim();
+  let pesan: string = periksaPilihanAngka(jawaban, min, maks);
+
+  // perulangan while: ulangi selama pilihan belum valid
+  while (pesan !== "") {
+    console.log("  [!] " + pesan);
+    jawaban = (await rl.question(pertanyaan)).trim();
+    pesan = periksaPilihanAngka(jawaban, min, maks);
+  }
+  return Number(jawaban);
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
