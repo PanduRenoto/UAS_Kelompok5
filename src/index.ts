@@ -90,11 +90,26 @@ const daftarBooking: Booking[] = buatDataAwal();
 
 // blok 3: fungsi utilitas
 
+
 // format angka ke rupiah
 function formatRupiah(angka: number): string {
-    return "Rp" + angka;
+    return "Rp" + angka.toLocaleString("id-ID");
 }
+// Mengubah teks jam "HH:mm" menjadi total menit sejak 00:00, mengembalikan null kalau formatnya salah
+function ubahjamKemenit(teks: string): number | null {
+  //pola jam yang sah: jam 00-23, menit 00-59, dipisah titik dua
+  const polajam: RegExp = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  // Mencocokan teks (spasi di awal dan akhir dibuang dulu) dengan pola 
+  const hasil = polajam.exec(teks.trim());
 
+  // seleksi if: teks tidak cocok dengan pola berarti format salah 
+  if (hasil === null) {
+    return null;
+  }
+
+  // Total menit = jam x 60 + menit
+  return Number(hasil[1]) * 60 + Number(hasil[2]);
+}
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(_data: Booking[]): number {
     return 0;
