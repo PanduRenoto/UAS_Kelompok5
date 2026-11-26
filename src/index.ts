@@ -120,6 +120,56 @@ function hitungTotalPendapatan(_data: Booking[]): number {
 }
 
 // blok 4: perhitungan dan validasi jadwal
+// Memeriksa satu jam mulai: format, jam operasional, dan tumpang tindih, lalu menghitung jam selesainya
+function validasiSesiBaru(
+    jamMulaiTeks: string,
+    durasiJam: number,
+    lapangan: Lapangan,
+    sesiSebelumnya: SesiBooking[]
+): HasilValidasiSesi {
+    // Seleksi if 1: format jam harus HH:mm, ubahJamKeMenit mengembalikan null kalau salah
+    const mulaiMenit: number | null = ubahJamKeMenit(jamMulaiTeks);
+    if (mulaiMenit === null) {
+        return { valid: false, pesan: "Format jam harus HH:mm, contoh 09:00." };
+    }
+
+    // Jam selesai = jam mulai + durasi (jam diubah ke menit dengan compound *=)
+    let durasiMenit: number = durasiJam;
+    durasiMenit *= 60;
+    const selesaiMenit: number = mulaiMenit + durasiMenit;
+
+    // Seleksi if 2 (lebih dari satu kondisi): sesi harus di dalam jam operasional lapangan
+    if (mulaiMenit < lapangan.jamBukaMenit || selesaiMenit > lapangan.jamTutupMenit) {
+        return {
+            valid: false,
+            pesan: `Sesi ${formatMenit(mulaiMenit)}-${formatMenit(selesaiMenit)} di luar jam operasional ${lapangan.jamOperasional}.`
+        };
+    }
+
+    // Perulangan for...of: bandingkan dengan setiap sesi yang sudah dimasukkan
+    for (const sesi of sesiSebelumnya) {
+        // Seleksi if 3: tolak kalau waktunya bertumpuk dengan sesi lain
+        if (sesiBertumpuk(mulaiMenit, selesaiMenit, sesi.mulaiMenit, sesi.selesaiMenit)) {
+            return {
+                valid: false,
+                pesan: `Bertumpuk dengan sesi ${sesi.nomor} (${sesi.jamMulai}-${sesi.jamSelesai}).`
+            };
+        }
+    }
+
+    // Semua pemeriksaan lolos, kembalikan sesi baru
+    return {
+        valid: true,
+        pesan: "",
+        sesi: {
+            nomor: sesiSebelumnya.length + 1,
+            jamMulai: formatMenit(mulaiMenit),
+            jamSelesai: formatMenit(selesaiMenit),
+            mulaiMenit,
+            selesaiMenit
+        }
+    };
+}
 
 // blok 5: fitur create
 
