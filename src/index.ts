@@ -125,6 +125,37 @@ function sesiBertumpuk(mulaiA: number, selesaiA: number, mulaiB: number, selesai
   //Bertumpuk kalau A mulai sebelum B selesai DAN A selesai setelah B mulai
   return mulaiA < selesaiB && selesaiA > mulaiB;
 }
+// Membuat label 7 hari ke depan mulai besok, contoh "Selasa, 1 Desember 2026"
+function buatDaftarTanggal(acuan?: Date): string[] {
+    // Nama hari sesuai urutan getDay (0 = Minggu)
+    const daftarNamaHari: string[] = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    // Nama bulan sesuai urutan getMonth (0 = Januari)
+    const daftarNamaBulan: string[] = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // Tanggal acuan: hari ini, kecuali diberikan tanggal lain
+    const tanggalAcuan: Date = acuan ?? new Date();
+    // Penampung label tanggal
+    const daftar: string[] = [];
+
+    // Perulangan for: urutan 1 = besok sampai urutan 7 = tujuh hari ke depan
+    for (let urutan = 1; urutan <= jumlahHariBooking; urutan++) {
+        // Date otomatis menyesuaikan pergantian bulan dan tahun
+        const tanggal: Date = new Date(
+            tanggalAcuan.getFullYear(),
+            tanggalAcuan.getMonth(),
+            tanggalAcuan.getDate() + urutan
+        );
+        // Menyusun label: nama hari, tanggal, nama bulan, tahun
+        const label: string = `${daftarNamaHari[tanggal.getDay()]}, ${tanggal.getDate()} ${daftarNamaBulan[tanggal.getMonth()]} ${tanggal.getFullYear()}`;
+        daftar.push(label);
+    }
+
+    // Mengembalikan 7 label tanggal
+    return daftar;
+}
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(_data: Booking[]): number {
     return 0;
