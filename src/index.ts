@@ -379,6 +379,25 @@ function periksaNama(nama: string): string {
   return "";
 }
 
+// mengecek apakah sesi baru bertabrakan dengan booking lain di lapangan dan tanggal yang sama
+// mengembalikan pesan error atau "" kalau tidak bentrok
+function sesiBentrokDenganBooking(namaLapangan: string, tanggal: string, sesiBaru: SesiBooking): string {
+  // perulangan for...of: periksa setiap booking yang sudah tersimpan
+  for (const booking of daftarBooking) {
+    // hanya booking di lapangan dan tanggal yang sama yang perlu dibandingkan
+    if (booking.lapangan === namaLapangan && booking.tanggal === tanggal) {
+      // perulangan for...of: bandingkan dengan setiap sesi booking tersebut
+      for (const sesi of booking.sesi) {
+        if (sesiBertumpuk(sesiBaru.mulaiMenit, sesiBaru.selesaiMenit, sesi.mulaiMenit, sesi.selesaiMenit)) {
+          return `Bentrok dengan booking #${booking.id} (${sesi.jamMulai}-${sesi.jamSelesai}).`;
+        }
+      }
+    }
+  }
+  // tidak ada jadwal yang bertabrakan
+  return "";
+}
+
 // memeriksa pilihan angka (kosong, bukan angka/NaN, negatif, desimal, di luar batas)
 function periksaPilihanAngka(teks: string, min: number, maks: number): string {
   // seleksi if: input tidak boleh kosong
