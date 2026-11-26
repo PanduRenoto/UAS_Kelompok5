@@ -175,6 +175,7 @@ function buatDaftarTanggal(acuan?: Date): string[] {
     // Mengembalikan 7 label tanggal
     return daftar;
 }
+
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(data: Booking[]): number {
     // Penampung total pendapatan
@@ -363,6 +364,66 @@ function buatBooking(
 }
 
 // blok 5: fitur create
+
+// memeriksa nama pemesan, mengembalikan pesan error atau "" kalau valid
+function periksaNama(nama: string): string {
+  // seleksi if: nama tidak boleh kosong
+  if (nama.trim() === "") {
+    return "Nama tidak boleh kosong.";
+  }
+  // seleksi if: nama tidak boleh terlalu panjang
+  if (nama.trim().length > 30) {
+    return "Nama maksimal 30 karakter.";
+  }
+  // nama lolos pemeriksaan
+  return "";
+}
+
+// mengecek apakah sesi baru bertabrakan dengan booking lain di lapangan dan tanggal yang sama
+// mengembalikan pesan error atau "" kalau tidak bentrok
+function sesiBentrokDenganBooking(namaLapangan: string, tanggal: string, sesiBaru: SesiBooking): string {
+  // perulangan for...of: periksa setiap booking yang sudah tersimpan
+  for (const booking of daftarBooking) {
+    // hanya booking di lapangan dan tanggal yang sama yang perlu dibandingkan
+    if (booking.lapangan === namaLapangan && booking.tanggal === tanggal) {
+      // perulangan for...of: bandingkan dengan setiap sesi booking tersebut
+      for (const sesi of booking.sesi) {
+        if (sesiBertumpuk(sesiBaru.mulaiMenit, sesiBaru.selesaiMenit, sesi.mulaiMenit, sesi.selesaiMenit)) {
+          return `Bentrok dengan booking #${booking.id} (${sesi.jamMulai}-${sesi.jamSelesai}).`;
+        }
+      }
+    }
+  }
+  // tidak ada jadwal yang bertabrakan
+  return "";
+}
+
+// memeriksa pilihan angka (kosong, bukan angka/NaN, negatif, desimal, di luar batas)
+function periksaPilihanAngka(teks: string, min: number, maks: number): string {
+  // seleksi if: input tidak boleh kosong
+  if (teks.trim() === "") {
+    return "Input tidak boleh kosong.";
+  }
+
+  // ubah teks menjadi angka
+  const angka: number = Number(teks);
+
+  // seleksi if: hasil ubah harus berupa angka
+  if (Number.isNaN(angka)) {
+    return "Input harus berupa angka.";
+  }
+  // seleksi if: angka tidak boleh negatif
+  if (angka < 0) {
+    return "Angka tidak boleh negatif.";
+  }
+  // seleksi if dengan dua kondisi: harus bulat dan berada dalam rentang min sampai maks
+  if (!Number.isInteger(angka) || angka < min || angka > maks) {
+    return `Masukkan angka bulat ${min} sampai ${maks}.`;
+  }
+
+  // angka lolos pemeriksaan
+  return "";
+}
 
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
