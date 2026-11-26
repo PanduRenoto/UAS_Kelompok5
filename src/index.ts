@@ -55,6 +55,10 @@ interface HasilValidasi {
     pesan: string;  // alasan penolakan kalau tidak valid
 }
 
+// jam buka dan tutup dalam menit sejak 00:00 (480 = 08:00, 1380 = 23:00)
+const JAM_BUKA_MENIT: number = 480;
+const JAM_TUTUP_MENIT: number = 1380;
+
 // batas durasi sewa per booking (jam)
 const MIN_DURASI: number = 1;
 const MAKS_DURASI: number = 3;
@@ -244,6 +248,28 @@ function buatDaftarTanggal(acuan?: Date): string[] {
     // Mengembalikan 7 label tanggal
     return daftar;
 }
+
+// validasi jam mulai: format benar dan sesi masih dalam jam operasional
+function validasiJamMulai(teks: string, durasiJam: number): HasilValidasi {
+    const mulai = ubahJamKeMenit(teks);
+    if (mulai === null) {
+        return { valid: false, pesan: "Format jam harus HH:mm, contoh 09:00." };
+    }
+
+    // jam selesai = jam mulai + durasi (dalam menit), memakai operator compound
+    let selesai = mulai;
+    selesai += durasiJam * 60;
+
+    if (mulai < JAM_BUKA_MENIT || selesai > JAM_TUTUP_MENIT) {
+        return {
+            valid: false,
+            pesan: "Sesi " + formatMenit(mulai) + "-" + formatMenit(selesai) +
+                " di luar jam operasional " + formatMenit(JAM_BUKA_MENIT) + "-" + formatMenit(JAM_TUTUP_MENIT) + "."
+        };
+    }
+    return { valid: true, pesan: "" };
+}
+
 // hitung total pendapatan dari booking yang lunas
 function hitungTotalPendapatan(data: Booking[]): number {
     // Penampung total pendapatan
