@@ -50,22 +50,6 @@ interface Booking {
   statusPesanan: string;       // status pesanan
 }
 
-interface HasilValidasi {
-    valid: boolean; // true kalau input boleh dipakai
-    pesan: string;  // alasan penolakan kalau tidak valid
-}
-
-// jam buka dan tutup dalam menit sejak 00:00 (480 = 08:00, 1380 = 23:00)
-const JAM_BUKA_MENIT: number = 480;
-const JAM_TUTUP_MENIT: number = 1380;
-
-// batas durasi sewa per booking (jam)
-const MIN_DURASI: number = 1;
-const MAKS_DURASI: number = 3;
-
-// batas panjang nama pemesan
-const MAKS_NAMA: number = 30;
-
 // blok 2: konstanta dan data awal
 
 // batas maksimal sesi
@@ -146,63 +130,6 @@ function ubahJamKeMenit(teks: string): number | null {
   return Number(hasil[1]) * 60 + Number(hasil[2]);
 }
 
-// validasi nama: tidak boleh kosong dan tidak terlalu panjang
-function validasiNama(nama: string): HasilValidasi {
-    if (nama.trim() === "") {
-        return { valid: false, pesan: "Nama tidak boleh kosong." };
-    }
-    if (nama.trim().length > MAKS_NAMA) {
-        return { valid: false, pesan: "Nama maksimal " + MAKS_NAMA + " karakter." };
-    }
-    return { valid: true, pesan: "" };
-}
-
-// validasi tanggal: format YYYY-MM-DD, tanggal nyata, dan tidak boleh sudah lewat
-function validasiTanggal(teks: string): HasilValidasi {
-    // cek pola format tanggal
-    const cocok = /^(\d{4})-(\d{2})-(\d{2})$/.exec(teks);
-    if (cocok === null) {
-        return { valid: false, pesan: "Format tanggal harus YYYY-MM-DD, contoh 2026-12-15." };
-    }
-
-    const tahun = Number(cocok[1]);
-    const bulan = Number(cocok[2]);
-    const hari = Number(cocok[3]);
-    const tanggal = new Date(tahun, bulan - 1, hari);
-
-    // Date menggeser tanggal yang tidak nyata (misal 31 Februari), jadi dibandingkan ulang
-    if (tanggal.getFullYear() !== tahun || tanggal.getMonth() !== bulan - 1 || tanggal.getDate() !== hari) {
-        return { valid: false, pesan: "Tanggal tersebut tidak ada di kalender." };
-    }
-
-    // tanggal tidak boleh sebelum hari ini
-    const hariIni = new Date();
-    hariIni.setHours(0, 0, 0, 0);
-    if (tanggal < hariIni) {
-        return { valid: false, pesan: "Tanggal tidak boleh yang sudah lewat." };
-    }
-
-    return { valid: true, pesan: "" };
-}
-
-// validasi durasi: harus angka, bukan NaN, tidak negatif, bulat, dan dalam batas
-function validasiDurasi(teks: string): HasilValidasi {
-    if (teks.trim() === "") {
-        return { valid: false, pesan: "Durasi tidak boleh kosong." };
-    }
-    const angka = Number(teks);
-    if (Number.isNaN(angka)) {
-        return { valid: false, pesan: "Durasi harus berupa angka." };
-    }
-    if (angka < 0) {
-        return { valid: false, pesan: "Durasi tidak boleh negatif." };
-    }
-    if (!Number.isInteger(angka) || angka < MIN_DURASI || angka > MAKS_DURASI) {
-        return { valid: false, pesan: "Durasi harus bilangan bulat " + MIN_DURASI + " sampai " + MAKS_DURASI + " jam." };
-    }
-    return { valid: true, pesan: "" };
-}
-
 // Mengubah total menit sejak 00:00 menjadi teks "HH:mm", contoh 540 menjadi "09.00"
 function formatMenit(totalMenit: number): string {
   // Jam adalah hasil bagi bulat, menit adalah sisa bagi (modulo)
@@ -247,27 +174,6 @@ function buatDaftarTanggal(acuan?: Date): string[] {
 
     // Mengembalikan 7 label tanggal
     return daftar;
-}
-
-// validasi jam mulai: format benar dan sesi masih dalam jam operasional
-function validasiJamMulai(teks: string, durasiJam: number): HasilValidasi {
-    const mulai = ubahJamKeMenit(teks);
-    if (mulai === null) {
-        return { valid: false, pesan: "Format jam harus HH:mm, contoh 09:00." };
-    }
-
-    // jam selesai = jam mulai + durasi (dalam menit), memakai operator compound
-    let selesai = mulai;
-    selesai += durasiJam * 60;
-
-    if (mulai < JAM_BUKA_MENIT || selesai > JAM_TUTUP_MENIT) {
-        return {
-            valid: false,
-            pesan: "Sesi " + formatMenit(mulai) + "-" + formatMenit(selesai) +
-                " di luar jam operasional " + formatMenit(JAM_BUKA_MENIT) + "-" + formatMenit(JAM_TUTUP_MENIT) + "."
-        };
-    }
-    return { valid: true, pesan: "" };
 }
 
 // hitung total pendapatan dari booking yang lunas
@@ -458,6 +364,20 @@ function buatBooking(
 }
 
 // blok 5: fitur create
+
+// memeriksa nama pemesan, mengembalikan pesan error atau "" kalau valid
+function periksaNama(nama: string): string {
+  // seleksi if: nama tidak boleh kosong
+  if (nama.trim() === "") {
+    return "Nama tidak boleh kosong.";
+  }
+  // seleksi if: nama tidak boleh terlalu panjang
+  if (nama.trim().length > 30) {
+    return "Nama maksimal 30 karakter.";
+  }
+  // nama lolos pemeriksaan
+  return "";
+}
 
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
