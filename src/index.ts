@@ -480,6 +480,18 @@ async function tanyaPilihanAngka(rl: readline.Interface, pertanyaan: string, min
   return Number(jawaban);
 }
 
+// menanyakan Y/N sampai jawabannya benar, true kalau Y
+async function tanyaYaTidak(rl: readline.Interface, pertanyaan: string): Promise<boolean> {
+  let jawaban: string = (await rl.question(pertanyaan)).trim().toLowerCase();
+
+  // perulangan while: hanya terima y atau n
+  while (jawaban !== "y" && jawaban !== "n") {
+    console.log("  [!] Jawab dengan Y atau N.");
+    jawaban = (await rl.question(pertanyaan)).trim().toLowerCase();
+  }
+  return jawaban === "y";
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
