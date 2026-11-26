@@ -251,13 +251,13 @@ function buatBooking(
         if (hasil.valid && hasil.sesi !== undefined) {
             sesiList.push(hasil.sesi);
         } else {
-            throw new Error(Sesi ${sesiList.length + 1} (${namaPemesan}): ${hasil.pesan});
+            throw new Error(`Sesi ${sesiList.length + 1} (${namaPemesan}): ${hasil.pesan}`);
         }
     }
 
     // Seleksi if: jumlah sesi harus 1 sampai maxSesi
     if (sesiList.length < 1 || sesiList.length > maxSesi) {
-        throw new Error(Jumlah sesi harus antara 1 dan ${maxSesi}.);
+        throw new Error(`Jumlah sesi harus antara 1 dan ${maxSesi}.`);
     }
 
     // Hitung subtotal, persen diskon, nilai diskon (dibulatkan ke rupiah), dan total bayar
