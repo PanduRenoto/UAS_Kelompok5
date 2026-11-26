@@ -189,6 +189,46 @@ function hitungSubtotal(daftarSesi: SesiBooking[], hargaPerJam: number): number 
     return subtotal;
 }
 
+// Menghitung persen diskon dari durasi dan jumlah sesi (hasil bulat, 10 berarti 10%)
+function hitungPersenDiskon(durasiJam: number, jumlahSesi: number): number {
+    // Penampung persen diskon dari jumlah sesi dan dari durasi
+    let persenDiskonSesi: number = 0;
+    let persenDiskonDurasi: number = 0;
+
+    // Nested tingkat 1 (if): diskon hanya untuk pesanan minimal 2 sesi
+    if (jumlahSesi >= minSesiDiskonDurasi) {
+        // Nested tingkat 2 (if): jumlah sesi tidak boleh melebihi batas maksimal
+        if (jumlahSesi <= maxSesi) {
+            // Diskon dari jumlah sesi: 2 sesi = 5%, 3 sesi = 10%
+            if (jumlahSesi === 2) {
+                persenDiskonSesi = diskonSesi2;
+            } else if (jumlahSesi === 3) {
+                persenDiskonSesi = diskonSesi3;
+            }
+
+            // Nested tingkat 3 (switch): diskon durasi, 3 case + default, masing-masing dengan break
+            switch (durasiJam) {
+                case 1:
+                    persenDiskonDurasi = 0; // durasi 1 jam tidak dapat diskon durasi
+                    break;
+                case 2:
+                    persenDiskonDurasi = diskonDurasi2Jam;
+                    break;
+                case 3:
+                    persenDiskonDurasi = diskonDurasi3Jam;
+                    break;
+                default:
+                    persenDiskonDurasi = 0;
+                    break;
+            }
+        }
+    }
+
+    // Gabungkan kedua diskon, dibulatkan agar tidak muncul 15.000000000000002
+    const totalPersen: number = persenDiskonSesi + persenDiskonDurasi;
+    return Math.round(totalPersen * 100);
+}
+
 // blok 5: fitur create
 
 // tambah booking baru
