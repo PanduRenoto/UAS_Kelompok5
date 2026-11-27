@@ -492,9 +492,122 @@ async function tanyaYaTidak(rl: readline.Interface, pertanyaan: string): Promise
   return jawaban === "y";
 }
 
+// menampilkan ringkasan booking yang baru tersimpan
+function tampilkanBookingBaru(booking: Booking): void {
+  console.log("\nBooking berhasil ditambahkan!");
+  console.log("--------------------------------------------------");
+  console.log(`ID Booking       : ${booking.id}`);
+  console.log(`Pemesan          : ${booking.namaPemesan}`);
+  console.log(`Lapangan         : ${booking.lapangan}`);
+  console.log(`Tanggal          : ${booking.tanggal}`);
+  console.log(`Durasi per Sesi  : ${booking.durasiJam} jam`);
+  // forEach: tampilkan setiap sesi
+  booking.sesi.forEach((sesi) => {
+    console.log(`  Sesi ${sesi.nomor}         : ${sesi.jamMulai} - ${sesi.jamSelesai}`);
+  });
+  console.log(`Subtotal         : ${formatRupiah(booking.subtotal)}`);
+  console.log(`Diskon           : ${formatRupiah(booking.diskon)} (${booking.persenDiskon}%)`);
+  console.log(`Total Bayar      : ${formatRupiah(booking.totalBayar)}`);
+  console.log(`Metode Pembayaran: ${booking.metodePembayaran}`);
+  console.log(`Status Pesanan   : ${booking.statusPesanan}`);
+  console.log("--------------------------------------------------");
+  console.log(`Total data booking sekarang: ${daftarBooking.length}\n`);
+}
+
 // tambah booking baru
-async function tambahBooking(_rl: readline.Interface): Promise<void> {
-  tampilkanFiturBelumTersedia("Tambah Booking", 3);
+async function tambahBooking(rl: readline.Interface): Promise<void> {
+  console.log("\n=== TAMBAH BOOKING BARU ===");
+
+  // langkah 1: pilih lapangan
+  console.log("\nDaftar Lapangan:");
+  // perulangan for: tampilkan lapangan beserta harga
+  for (let i = 0; i < daftarLapangan.length; i++) {
+    const lap: Lapangan = daftarLapangan[i];
+    console.log(`  ${lap.id}. ${lap.nama} - ${formatRupiah(lap.hargaPerJam)}/jam (${lap.jamOperasional})`);
+  }
+  const noLapangan: number = await tanyaPilihanAngka(rl, "Pilih lapangan (nomor): ", 1, daftarLapangan.length);
+  const lapangan: Lapangan | undefined = daftarLapangan.find((lap) => lap.id === String(noLapangan));
+  // seleksi if: pengaman kalau lapangan tidak ditemukan
+  if (lapangan === undefined) {
+    console.log("Terjadi kesalahan: lapangan tidak ditemukan.\n");
+    return;
+  }
+ // langkah 2: nama pemesan
+  const namaPemesan: string = await tanyaNama(rl);
+
+  // langkah 3: pilih tanggal (7 hari ke depan mulai besok)
+  console.log("\nPilihan Tanggal:");
+  const tanggalList: string[] = buatDaftarTanggal();
+  tanggalList.forEach((label, index) => console.log(`  ${index + 1}. ${label}`));
+  const noTanggal: number = await tanyaPilihanAngka(rl, "Pilih tanggal (nomor): ", 1, tanggalList.length);
+  const tanggal: string = tanggalList[noTanggal - 1];
+
+  // langkah 4: pilih durasi per sesi
+  console.log("\nPilihan Durasi per Sesi:");
+  daftarDurasiPilihan.forEach((jam, index) => console.log(`  ${index + 1}. ${jam} Jam`));
+  const noDurasi: number = await tanyaPilihanAngka(rl, "Pilih durasi (nomor): ", 1, daftarDurasiPilihan.length);
+  const durasiJam: number = daftarDurasiPilihan[noDurasi - 1];
+
+  // langkah 5: jumlah sesi
+  const jumlahSesi: number = await tanyaPilihanAngka(rl, `Jumlah sesi (1-${maxSesi}): `, 1, maxSesi);
+
+  // langkah 6: jam mulai tiap sesi, harus valid dan tidak bentrok
+  console.log(`\nMasukkan jam mulai tiap sesi (format HH:mm, operasional ${lapangan.jamOperasional}).`);
+  const sesiList: SesiBooking[] = [];
+  const jamMulaiList: string[] = [];
+
+  // perulangan while: ulangi sampai jumlah sesi terpenuhi
+  while (sesiList.length < jumlahSesi) {
+    const nomorSesi: number = sesiList.length + 1;
+    const jamTeks: string = (await rl.question(`Jam mulai sesi ${nomorSesi}: `)).trim();
+    const hasil: HasilValidasiSesi = validasiSesiBaru(jamTeks, durasiJam, lapangan, sesiList);
+
+    // seleksi if: jam tidak lolos validasi sesi (format, operasional, tumpang tindih)
+    if (!hasil.valid || hasil.sesi === undefined) {
+      console.log("  [!] " + hasil.pesan);
+    } else {
+      // cek bentrok dengan booking lain yang sudah tersimpan
+      const pesanBentrok: string = sesiBentrokDenganBooking(lapangan.nama, tanggal, hasil.sesi);
+      if (pesanBentrok !== "") {
+        console.log("  [!] " + pesanBentrok);
+      } else {
+        sesiList.push(hasil.sesi);
+        jamMulaiList.push(hasil.sesi.jamMulai);
+        console.log(`  Sesi ${nomorSesi}: ${hasil.sesi.jamMulai} - ${hasil.sesi.jamSelesai}`);
+      }
+    }
+  }
+
+  // langkah 7: metode pembayaran
+  console.log("\nMetode Pembayaran:");
+  daftarMetodePembayaran.forEach((metode, index) => console.log(`  ${index + 1}. ${metode}`));
+  const noMetode: number = await tanyaPilihanAngka(rl, "Pilih metode (nomor): ", 1, daftarMetodePembayaran.length);
+  const metodePembayaran: string = daftarMetodePembayaran[noMetode - 1];
+
+  // langkah 8: status pembayaran menentukan status pesanan
+  const lunas: boolean = await tanyaYaTidak(rl, "Bayar sekarang? (Y/N): ");
+  const statusPesanan: string = lunas ? "Booking dikonfirmasi" : "Menunggu pembayaran";
+
+  // langkah 9: buat objek booking, simpan ke array dengan push, lalu tampilkan hasilnya
+  try {
+    const bookingBaru: Booking = buatBooking(
+      buatIdBaru(),
+      namaPemesan,
+      lapangan,
+      tanggal,
+      durasiJam,
+      jamMulaiList,
+      metodePembayaran,
+      lunas,
+      statusPesanan
+    );
+    daftarBooking.push(bookingBaru);
+    tampilkanBookingBaru(bookingBaru);
+  } catch (error: unknown) {
+    // kesalahan tidak menghentikan program, pengguna kembali ke menu
+    const pesan: string = error instanceof Error ? error.message : String(error);
+    console.log("\nGagal menambah booking: " + pesan + "\n");
+  }
 }
 
 // blok 6: fitur read
