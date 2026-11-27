@@ -425,6 +425,73 @@ function periksaPilihanAngka(teks: string, min: number, maks: number): string {
   return "";
 }
 
+// mengecek apakah id sudah dipakai booking lain
+function idSudahAda(id: number): boolean {
+  return daftarBooking.some((booking) => booking.id === id);
+}
+
+// membuat id baru: id terbesar + 1, lalu dipastikan tidak ada duplikasi
+function buatIdBaru(): number {
+  // penampung id terbesar yang sudah ada
+  let idTerbesar: number = 0;
+
+  // perulangan for...of: cari id terbesar
+  for (const booking of daftarBooking) {
+    if (booking.id > idTerbesar) {
+      idTerbesar = booking.id;
+    }
+  }
+
+  // id baru = id terbesar + 1
+  let idBaru: number = idTerbesar + 1;
+
+  // perulangan while: naikkan id selama masih dipakai (pencegahan duplikasi)
+  while (idSudahAda(idBaru)) {
+    idBaru++;
+  }
+  return idBaru;
+}
+
+// menanyakan nama sampai valid
+async function tanyaNama(rl: readline.Interface): Promise<string> {
+  let nama: string = (await rl.question("Nama pemesan: ")).trim();
+  let pesan: string = periksaNama(nama);
+
+  // perulangan while: ulangi selama nama belum valid
+  while (pesan !== "") {
+    console.log("  [!] " + pesan);
+    nama = (await rl.question("Nama pemesan: ")).trim();
+    pesan = periksaNama(nama);
+  }
+  return nama;
+}
+
+// menanyakan pilihan angka sampai valid, program tidak berhenti saat input salah
+async function tanyaPilihanAngka(rl: readline.Interface, pertanyaan: string, min: number, maks: number): Promise<number> {
+  let jawaban: string = (await rl.question(pertanyaan)).trim();
+  let pesan: string = periksaPilihanAngka(jawaban, min, maks);
+
+  // perulangan while: ulangi selama pilihan belum valid
+  while (pesan !== "") {
+    console.log("  [!] " + pesan);
+    jawaban = (await rl.question(pertanyaan)).trim();
+    pesan = periksaPilihanAngka(jawaban, min, maks);
+  }
+  return Number(jawaban);
+}
+
+// menanyakan Y/N sampai jawabannya benar, true kalau Y
+async function tanyaYaTidak(rl: readline.Interface, pertanyaan: string): Promise<boolean> {
+  let jawaban: string = (await rl.question(pertanyaan)).trim().toLowerCase();
+
+  // perulangan while: hanya terima y atau n
+  while (jawaban !== "y" && jawaban !== "n") {
+    console.log("  [!] Jawab dengan Y atau N.");
+    jawaban = (await rl.question(pertanyaan)).trim().toLowerCase();
+  }
+  return jawaban === "y";
+}
+
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
