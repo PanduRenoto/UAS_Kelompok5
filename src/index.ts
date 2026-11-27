@@ -492,6 +492,27 @@ async function tanyaYaTidak(rl: readline.Interface, pertanyaan: string): Promise
   return jawaban === "y";
 }
 
+// menampilkan ringkasan booking yang baru tersimpan
+function tampilkanBookingBaru(booking: Booking): void {
+  console.log("\nBooking berhasil ditambahkan!");
+  console.log("--------------------------------------------------");
+  console.log(`ID Booking       : ${booking.id}`);
+  console.log(`Pemesan          : ${booking.namaPemesan}`);
+  console.log(`Lapangan         : ${booking.lapangan}`);
+  console.log(`Tanggal          : ${booking.tanggal}`);
+  console.log(`Durasi per Sesi  : ${booking.durasiJam} jam`);
+  // forEach: tampilkan setiap sesi
+  booking.sesi.forEach((sesi) => {
+    console.log(`  Sesi ${sesi.nomor}         : ${sesi.jamMulai} - ${sesi.jamSelesai}`);
+  });
+  console.log(`Subtotal         : ${formatRupiah(booking.subtotal)}`);
+  console.log(`Diskon           : ${formatRupiah(booking.diskon)} (${booking.persenDiskon}%)`);
+  console.log(`Total Bayar      : ${formatRupiah(booking.totalBayar)}`);
+  console.log(`Metode Pembayaran: ${booking.metodePembayaran}`);
+  console.log(`Status Pesanan   : ${booking.statusPesanan}`);
+  console.log("--------------------------------------------------");
+  console.log(`Total data booking sekarang: ${daftarBooking.length}\n`);
+}
 // tambah booking baru
 async function tambahBooking(_rl: readline.Interface): Promise<void> {
   tampilkanFiturBelumTersedia("Tambah Booking", 3);
